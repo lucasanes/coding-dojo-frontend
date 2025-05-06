@@ -1,24 +1,22 @@
-import "./App.css";
+import './App.css';
 
-import { useState } from "react";
-import axios from "axios";
+import axios from 'axios';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 
-
-function App() {
-  const [numbers, setNumbers] = useState("");
-  const [feedback, setFeedback] = useState("");
+export default function App() {
+  const [numbers, setNumbers] = useState('');
+  const [loading, setLoading] = useState(false);
 
   function clickButton() {
-    // Enviar para a API os valores
-    if (feedback === "Carregando...") {
+    if (loading) {
       return;
     }
-    const list = numbers.replace(/\s/g, "").split(",");
 
-    console.log(list);
+    const list = numbers.replace(/\s/g, '').split(',');
 
     if (!list.length || !numbers) {
-      alert("error: Voce deve preencher algo");
+      toast.error('Você deve preencher algo');
       return;
     }
 
@@ -28,7 +26,7 @@ function App() {
 
     list.forEach((item) => {
       if (isNaN(+item)) {
-        alert("erro: Utilize apenas números");
+        toast.error('Utilize apenas números');
         error = true;
       } else {
         listNumbers.push(+item);
@@ -39,35 +37,37 @@ function App() {
       return;
     }
 
-    console.log(listNumbers);
-
-    setFeedback("Carregando...");
+    setLoading(true);
 
     axios
-      .post("https://coding-dojo-api.lucasanes.com/heapsort", listNumbers)
+      .post(import.meta.env.VITE_API_URL, listNumbers)
       .then((response) => {
-        console.log(response);
-      }).catch(()=>{
-        setFeedback("Falha ao se comunicar com API")
+        setLoading(false);
+        setNumbers('');
+
+        const data = response.data as number[];
+
+        toast.success('Sucesso!');
+        toast.info(`Lista ordenada: ${data.join(', ')}`);
       })
+      .catch(() => {
+        setLoading(false);
+      });
   }
 
   return (
     <>
-      <div className="card">
-        <label htmlFor="numbers">Lista de números</label>
+      <div className='card'>
+        <label htmlFor='numbers'>Lista de números</label>
         <input
-          id="numbers"
-          type="text"
-          placeholder="ex: 1, 5, 7, 2"
+          id='numbers'
+          type='text'
+          placeholder='ex: 1, 5, 7, 2'
           onChange={(e) => setNumbers(e.target.value)}
           value={numbers}
         />
         <button onClick={clickButton}> Enviar </button>
-        {feedback}
       </div>
     </>
   );
 }
-
-export default App;
