@@ -4,6 +4,10 @@ import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
+interface DataType {
+  sortedArray: number[];
+}
+
 export default function App() {
   const [numbers, setNumbers] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,10 +49,10 @@ export default function App() {
         setLoading(false);
         setNumbers('');
 
-        const data = response.data as number[];
+        const data = response.data as DataType;
 
         toast.success('Sucesso!');
-        toast.info(`Lista ordenada: ${data.join(', ')}`);
+        toast.info(`Lista ordenada: ${data.sortedArray.join(', ')}`);
       })
       .catch(() => {
         setLoading(false);
