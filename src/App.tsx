@@ -1,44 +1,55 @@
 import "./App.css";
 
 import { useState } from "react";
+import axios from "axios";
 
 
 function App() {
   const [numbers, setNumbers] = useState("");
+  const [feedback, setFeedback] = useState("");
 
   function clickButton() {
-    // pegar os valores inputados 
-    // transformar em uma lista quebrando por "," ou ", "
-    // validar se cada item é um número
     // Enviar para a API os valores
-
+    if (feedback === "Carregando...") {
+      return;
+    }
     const list = numbers.replace(/\s/g, "").split(",");
 
     console.log(list);
-    
-    if(!list.length || !numbers){
-      alert("error: Voce deve preencher algo")
-      return
+
+    if (!list.length || !numbers) {
+      alert("error: Voce deve preencher algo");
+      return;
     }
 
     const listNumbers: number[] = [];
 
     let error = false;
 
-    list.forEach((item)=>{
-      if(isNaN(+item)){
+    list.forEach((item) => {
+      if (isNaN(+item)) {
         alert("erro: Utilize apenas números");
         error = true;
-      } else{
-        listNumbers.push(+item)
+      } else {
+        listNumbers.push(+item);
       }
-    })
-    
+    });
+
     if (error) {
       return;
     }
 
-    console.log(listNumbers)
+    console.log(listNumbers);
+
+    setFeedback("Carregando...");
+
+    axios
+      .post("https://coding-dojo-api.lucasanes.com/heapsort", listNumbers)
+      .then((response) => {
+        console.log(response);
+      }).catch(()=>{
+        setFeedback("Falha ao se comunicar com API")
+      })
   }
 
   return (
@@ -53,6 +64,7 @@ function App() {
           value={numbers}
         />
         <button onClick={clickButton}> Enviar </button>
+        {feedback}
       </div>
     </>
   );
